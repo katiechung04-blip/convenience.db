@@ -1,66 +1,26 @@
-import sqlite3
-import os
+# 편의점 데이터베이스 관리 시스템 (Convenience Store DB System)
 
-DB_NAME = "convenience.db"
+본 프로젝트는 편의점 유통 환경에서 발생하는 판매, 재고, 발주, 상품/공급업체, 고객 정보를 유기적으로 관리하고 통계를 분석할 수 있는 SQLite 기반의 CLI 인터페이스 시스템입니다.
 
-# 1. 무조건 이 스크립트가 있는 폴더에 생성되도록 경로 강제 지정
-BASE_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in locals() else "."
-DB_PATH = os.path.join(BASE_DIR, DB_NAME)
+명세서 요구사항에 충족하도록 단순 조회를 넘어 POS 판매 처리(실시간 재고 연동 차감 및 회원 포인트 적립), 신규 발주 등록 등 실시간 데이터 변경(CUD) 및 트랜잭션 안전성을 구현하였습니다.
 
-print("시작: 테이블 구조 생성 및 데이터 적재를 시작합니다.")
+## 1. 폴더 구조 및 파일 위치 (Directory Structure)
+본 프로젝트는 명세서의 제출 규격을 준수하여 가장 상위 디렉토리에 본 README 파일을 배치하였으며, 소스 코드는 src 폴더 내에 격리하여 구성하였습니다.
+.
+├── README.md               <- 시스템 설명 및 실행 가이드 (최상위 디렉토리 위치)
+├── ERD_설명문서.pdf         <- ERD 및 엔티티/관계 명세서 (클라우드 다운로드 링크 포함)
+└── src/                    <- 구현 소스 코드 디렉토리
+    ├── init_db.py          <- 역할 기반 7대 메뉴 CLI 인터페이스 메인 코드
+    └── make_db.py          <- 평가용 샘플 데이터 생성 스크립트
 
-conn = sqlite3.connect(DB_PATH)
-cur = conn.cursor()
-cur.execute("PRAGMA foreign_keys = ON;")
+## 2. 데이터베이스 구성 및 클라우드 안내
+- 과제 요건에 의거하여 실제 데이터 파일(`convenience.db`)은 제출물 압축본(.zip)에 포함하지 않았습니다.
+- 전체 데이터가 적재된 원본 데이터베이스 파일은 'ERD_설명문서.pdf' 내에 명시된 구글 드라이브 공유 링크를 통해 다운로드하실 수 있습니다.
 
-# 테이블 생성
-cur.execute("CREATE TABLE IF NOT EXISTS Store (store_id TEXT PRIMARY KEY, city TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS Brand (brand_id TEXT PRIMARY KEY, brand_name TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS Product (barcode_number TEXT PRIMARY KEY, product_name TEXT, specification TEXT, packaging TEXT, brand_id TEXT, FOREIGN KEY(brand_id) REFERENCES Brand(brand_id));")
-cur.execute("CREATE TABLE IF NOT EXISTS StoreInventory (store_id TEXT, barcode_number TEXT, stock_quantity INTEGER, selling_price INTEGER, PRIMARY KEY(store_id, barcode_number));")
-cur.execute("CREATE TABLE IF NOT EXISTS Supplier (supplier_id TEXT PRIMARY KEY, supplier_name TEXT, phone_number TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS PurchaseOrder (order_id TEXT PRIMARY KEY, store_id TEXT, supplier_id TEXT, order_date TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS PurchaseOrderDetail (order_id TEXT, barcode_number TEXT, order_quantity INTEGER, PRIMARY KEY(order_id, barcode_number));")
-cur.execute("CREATE TABLE IF NOT EXISTS ProductSupplier (supplier_id TEXT, barcode_number TEXT, supply_price INTEGER, PRIMARY KEY(supplier_id, barcode_number));")
-cur.execute("CREATE TABLE IF NOT EXISTS Customer (customer_id TEXT PRIMARY KEY, phone_number TEXT);")
-cur.execute("CREATE TABLE IF NOT EXISTS Member (customer_id TEXT PRIMARY KEY, member_name TEXT, point INTEGER, FOREIGN KEY(customer_id) REFERENCES Customer(customer_id));")
-cur.execute("CREATE TABLE IF NOT EXISTS Sale (sale_id TEXT PRIMARY KEY, store_id TEXT, customer_id TEXT, sale_date TEXT, total_amount INTEGER);")
-cur.execute("CREATE TABLE IF NOT EXISTS SaleDetail (sale_id TEXT, barcode_number TEXT, quantity INTEGER, unit_price INTEGER, PRIMARY KEY(sale_id, barcode_number));")
+## 3. 인터페이스 실행 방법 (How to Run)
+본 프로그램은 파이썬 내장 라이브러리(`sqlite3`, `os`, `datetime`)만을 사용하여 개발되었으므로, 별도의 외부 패키지 설치(`pip install`) 없이 즉시 실행이 가능합니다. 압축을 해제한 후 터미널에서 아래 순서대로 실행해 주십시오.
 
-# 샘플 데이터 삽입
-cur.executemany("INSERT OR IGNORE INTO Store VALUES (?, ?);", [('S01', '서울시'), ('S02', '부산시')])
-cur.executemany("INSERT OR IGNORE INTO Brand VALUES (?, ?);", [('B01', '칠성'), ('B02', '농심')])
-cur.executemany("INSERT OR IGNORE INTO Product VALUES (?, ?, ?, ?, ?);", [
-    ('P001', '칠성사이다', '500ml', '페트병', 'B01'),
-    ('P002', '신라면 블랙', '134g', '컵라면', 'B02')
-])
-cur.executemany("INSERT OR IGNORE INTO StoreInventory VALUES (?, ?, ?, ?);", [
-    ('S01', 'P001', 3, 2000), 
-    ('S01', 'P002', 15, 1600),
-    ('S02', 'P001', 20, 2100)
-])
-cur.executemany("INSERT OR IGNORE INTO Supplier VALUES (?, ?, ?);", [
-    ('SUP01', '대형유통네트웍스', '02-123-4567'),
-    ('SUP02', '백산물류', '031-987-6543')
-])
-cur.executemany("INSERT OR IGNORE INTO ProductSupplier VALUES (?, ?, ?);", [
-    ('SUP01', 'P001', 1200),
-    ('SUP02', 'P002', 900)
-])
-cur.executemany("INSERT OR IGNORE INTO PurchaseOrder VALUES (?, ?, ?, ?);", [('O001', 'S01', 'SUP01', '2026-06-18')])
-cur.executemany("INSERT OR IGNORE INTO PurchaseOrderDetail VALUES (?, ?, ?);", [('O001', 'P001', 100)])
-cur.executemany("INSERT OR IGNORE INTO Customer VALUES (?, ?);", [('C001', '010-1111-2222'), ('C002', '010-3333-4444')])
-cur.executemany("INSERT OR IGNORE INTO Member VALUES (?, ?, ?);", [('C001', '이영희', 1500)])
-cur.executemany("INSERT OR IGNORE INTO Sale VALUES (?, ?, ?, ?, ?);", [
-    ('SALE01', 'S01', 'C001', '2026-06-18', 4000),
-    ('SALE02', 'S02', 'C002', '2026-06-18', 1600)
-])
-cur.executemany("INSERT OR IGNORE INTO SaleDetail VALUES (?, ?, ?, ?);", [
-    ('SALE01', 'P001', 2, 2000),
-    ('SALE02', 'P002', 1, 1600)
-])
-
-conn.commit()
-conn.close()
-
-print("완료: convenience.db 파일이 성공적으로 생성되었습니다!")
+### STEP 1: 평가용 데이터베이스 파일 생성 (make_db.py)
+채점관 환경에서 즉시 기능 테스트 및 데이터 변경 처리가 가능하도록 필수 테이블 구조와 샘플 데이터를 로컬에 자동으로 구축하는 스크립트입니다.
+```bash
+python src/make_db.py
