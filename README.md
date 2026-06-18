@@ -11,9 +11,10 @@
 ```text
 팀기니_DB최종.zip
 ├── README.md
-├── ERD_설명문서.pdf
+├── ERD_design_document.pdf
+├── Relational schema.pdf
+├──sample_queries.sql
 └── main.py
-└── sample_queries.sql
 ```
 
 각 파일의 역할은 다음과 같습니다.
@@ -22,8 +23,11 @@
 README.md
 - 시스템 개요 및 실행 방법 안내
 
-ERD_설명문서.pdf
-- E-R Diagram, Relational Schema, 설계 설명, 데이터베이스 다운로드 링크 포함 문서
+ERD_design_document.pdf
+- E-R Diagram 및 E-R Diagram 설계 설명 포함
+
+Relational schema.pdf
+- E-R Diagram을 변환한 Relational Schema 포함
 
 main.py
 - SQLite 데이터베이스를 읽어 CLI 인터페이스를 실행하는 메인 프로그램
