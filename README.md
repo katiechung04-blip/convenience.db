@@ -12,7 +12,7 @@
 팀기니_DB최종.zip
 ├── README.md
 ├── ERD_design_document.pdf
-├── Relational schema.pdf
+├── Relational_schema.pdf
 ├──sample_queries.sql
 └── main.py
 ```
@@ -26,7 +26,7 @@ README.md
 ERD_design_document.pdf
 - E-R Diagram 및 E-R Diagram 설계 설명 포함
 
-Relational schema.pdf
+Relational_schema.pdf
 - E-R Diagram을 변환한 Relational Schema 포함
 
 main.py
