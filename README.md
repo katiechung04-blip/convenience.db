@@ -46,7 +46,7 @@ src/sample_queries.sql
 convenience.db
 
 Google Drive 다운로드 링크:
-https://drive.google.com/file/d/1Is0LJoYnRmpdAhXsRkAtLUs0qUREMH72/view
+https://drive.google.com/file/d/1Is0LJoYnRmpdAhXsRkAtLUs0qUREMH72/view?usp=sharing
 
 접근 권한:
 링크가 있는 사용자는 다운로드 가능하도록 설정
