@@ -43,6 +43,20 @@ def check_database_ready():
     if conn is None:
         return False
 
+    # -------------------------------------------------------------
+    # [추가된 마법의 코드] make_db.py가 NonMember를 빼먹었으면 알아서 생성!
+    try:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS NonMember (
+            customer_id INTEGER PRIMARY KEY,
+            FOREIGN KEY(customer_id) REFERENCES Customer(customer_id)
+        );
+        """)
+        conn.commit()
+    except Exception:
+        pass
+    # -------------------------------------------------------------
+
     required_tables = [
         "Store",
         "Brand",
