@@ -1,4 +1,7 @@
-편의점 데이터베이스 관리 시스템 (Convenience Store DB System)본 프로젝트는 편의점 유통 환경에서 발생하는 판매, 재고, 발주, 상품/공급업체, 고객 정보를 유기적으로 관리하고 통계를 분석할 수 있는 SQLite 기반의 CLI(Command Line Interface) 시스템입니다.  1. 프로젝트 디렉토리 구조 및 파일 위치 (Directory Structure)본 프로젝트는 명세서의 지침에 따라 최상위 디렉토리에 본 README 파일을 배치하였으며, 전체 구조는 다음과 같습니다. 
+편의점 데이터베이스 관리 시스템 (Convenience Store DB System)
+
+
+본 프로젝트는 편의점 유통 환경에서 발생하는 판매, 재고, 발주, 상품/공급업체, 고객 정보를 유기적으로 관리하고 통계를 분석할 수 있는 SQLite 기반의 CLI(Command Line Interface) 시스템입니다.  1. 프로젝트 디렉토리 구조 및 파일 위치 (Directory Structure)본 프로젝트는 명세서의 지침에 따라 최상위 디렉토리에 본 README 파일을 배치하였으며, 전체 구조는 다음과 같습니다. 
 학번_이름_DB최종/            <- 최종 제출 압축 폴더 (.zip) [cite: 64, 74]
 │
 ├── README.md               <- [현재 파일] 시스템 개요, 파일 위치 및 상세 실행 가이드 
