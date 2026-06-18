@@ -1,3 +1,4 @@
+
 import sqlite3
 import os
 from datetime import datetime
@@ -42,20 +43,6 @@ def check_database_ready():
     conn = connect_db()
     if conn is None:
         return False
-
-    # -------------------------------------------------------------
-    # [추가된 마법의 코드] make_db.py가 NonMember를 빼먹었으면 알아서 생성!
-    try:
-        conn.execute("""
-        CREATE TABLE IF NOT EXISTS NonMember (
-            customer_id INTEGER PRIMARY KEY,
-            FOREIGN KEY(customer_id) REFERENCES Customer(customer_id)
-        );
-        """)
-        conn.commit()
-    except Exception:
-        pass
-    # -------------------------------------------------------------
 
     required_tables = [
         "Store",
@@ -1257,22 +1244,28 @@ def customer_management():
     while True:
         print("\n[고객 관리]")
         print("1. 전체 회원 조회")
-        print("2. 전화번호로 고객 조회")
-        print("3. 신규 회원 등록")
-        print("4. 고객 구매 내역 조회")
-        print("5. 뒤로가기")
+        print("2. 전체 비회원 조회")
+        print("3. 전화번호로 고객 조회")
+        print("4. 신규 회원 등록")
+        print("5. 신규 비회원 등록")
+        print("6. 고객 구매 내역 조회")
+        print("7. 뒤로가기")
 
         choice = input("선택: ").strip()
 
         if choice == "1":
             show_members()
         elif choice == "2":
-            search_customer_by_phone()
+            show_non_members()
         elif choice == "3":
-            register_member()
+            search_customer_by_phone()
         elif choice == "4":
-            show_customer_purchase_history()
+            register_member()
         elif choice == "5":
+            register_non_member()
+        elif choice == "6":
+            show_customer_purchase_history()
+        elif choice == "7":
             break
         else:
             print("잘못된 입력입니다.")
@@ -1297,6 +1290,27 @@ def show_members():
 
     rows = cur.fetchall()
     print_rows(rows, ["customer_id", "phone_number", "member_name", "point"])
+
+    conn.close()
+
+
+def show_non_members():
+    conn = connect_db()
+    if conn is None:
+        return
+
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT c.customer_id,
+           c.phone_number
+    FROM Customer c
+    JOIN NonMember nm ON c.customer_id = nm.customer_id
+    ORDER BY c.customer_id
+    """)
+
+    rows = cur.fetchall()
+    print_rows(rows, ["customer_id", "phone_number"])
 
     conn.close()
 
@@ -1394,6 +1408,72 @@ def register_member():
     except Exception as e:
         conn.rollback()
         print("회원 등록 중 오류가 발생했습니다.")
+        print(e)
+
+    finally:
+        conn.close()
+
+
+def register_non_member():
+    conn = connect_db()
+    if conn is None:
+        return
+
+    cur = conn.cursor()
+
+    try:
+        phone = input("전화번호 입력: ").strip()
+
+        cur.execute("""
+        SELECT customer_id
+        FROM Customer
+        WHERE phone_number = ?
+        """, (phone,))
+
+        row = cur.fetchone()
+
+        if row is not None:
+            customer_id = row[0]
+
+            cur.execute("""
+            SELECT customer_id
+            FROM NonMember
+            WHERE customer_id = ?
+            """, (customer_id,))
+
+            if cur.fetchone() is not None:
+                print("이미 비회원으로 등록된 고객입니다.")
+                return
+
+            cur.execute("""
+            SELECT customer_id
+            FROM Member
+            WHERE customer_id = ?
+            """, (customer_id,))
+
+            if cur.fetchone() is not None:
+                print("이미 회원으로 등록된 고객입니다. 비회원으로 중복 등록할 수 없습니다.")
+                return
+
+        else:
+            cur.execute("""
+            INSERT INTO Customer (phone_number)
+            VALUES (?)
+            """, (phone,))
+
+            customer_id = cur.lastrowid
+
+        cur.execute("""
+        INSERT INTO NonMember (customer_id)
+        VALUES (?)
+        """, (customer_id,))
+
+        conn.commit()
+        print("신규 비회원이 등록되었습니다.")
+
+    except Exception as e:
+        conn.rollback()
+        print("비회원 등록 중 오류가 발생했습니다.")
         print(e)
 
     finally:
