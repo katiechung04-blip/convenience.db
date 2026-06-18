@@ -24,7 +24,7 @@
 - 과제 요구사항에 의거하여 실제 데이터베이스 파일인 `convenience.db`는 제출 압축 파일(.zip)에 포함하지 않았습니다.
 - 전체 데이터가 적재된 정식 데이터베이스 파일은 아래 Google Drive 링크를 통해 다운로드하실 수 있습니다.
 
-* **Google Drive 다운로드 링크:** [여기에 convenience.db 공유 링크 입력]
+* **Google Drive 다운로드 링크:** (https://drive.google.com/file/d/1Is0LJoYnRmpdAhXsRkAtLUs0qUREMH72/view)
 
 ---
 
